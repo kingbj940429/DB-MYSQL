@@ -1,0 +1,328 @@
+import java.awt.event.*;
+import java.sql.*;
+import java.util.StringTokenizer;
+import javax.swing.*;
+
+
+
+public class bookListSwing_15011752 extends JFrame implements ActionListener {
+   JButton btnOk, btnReset, btnOk2, btnOk3, btnOk4,btnOk5,btnInit;
+   JTextArea txtResult;
+   JPanel pn1;
+   JTextField tf;
+   
+   static Connection con;
+   Statement stmt;
+   ResultSet rs;
+   String Driver = "";
+   String url = "jdbc:mysql://localhost:3306/madang?&serverTimezone=Asia/Seoul&useSSL=false";
+   String userid = "madang";
+   String pwd = "madang";
+   
+   String id=new String();
+   String[] arr=new String[5];
+   String query4;
+   int cnt=0;
+   int[] arr2=new int[5];
+   
+   public bookListSwing_15011752() {
+      super("15011752/김병준");
+      layInit();
+      conDB();
+      setVisible(true);
+      setBounds(200, 200, 800, 600); //가로위치,세로위치,가로길이,세로길이
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+   }
+
+   public void layInit() {
+      btnOk = new JButton("검색1 (book)");
+      btnOk2 = new JButton("검색2 (orders)");
+      btnOk3 = new JButton("검색3 (customer)");
+      btnOk5=new JButton("TextField 활성화");
+      btnOk4 = new JButton("입력 1");
+      btnReset = new JButton("초기화");
+      btnInit=new JButton("DB초기화");
+      txtResult = new JTextArea();
+      tf=new JTextField();
+      pn1 = new JPanel();
+      pn1.add(btnOk);
+      pn1.add(btnOk2);
+      pn1.add(btnOk3);
+      pn1.add(btnOk5);
+      pn1.add(btnOk4);
+      pn1.add(btnReset);
+      pn1.add(btnInit);
+      txtResult.setEditable(false);
+      tf.setEditable(false);
+      JScrollPane scrollPane = new JScrollPane(txtResult);
+      add("North", pn1);
+      add("Center", scrollPane);
+      add("South",tf);   //추가
+      try { /* 데이터베이스를 연결하는 과정 */
+          System.out.println("데이터베이스 연결 준비...");
+          con = DriverManager.getConnection(url, userid, pwd);
+          System.out.println("데이터베이스 연결 성공");
+       } catch (SQLException e1) {
+          e1.printStackTrace();
+       }
+      btnOk.addActionListener(this);
+      btnOk2.addActionListener(this);
+      btnOk3.addActionListener(this);
+      btnOk4.addActionListener(this);
+      btnOk5.addActionListener(this);
+      btnReset.addActionListener(this);
+      btnInit.addActionListener(new ActionListenerInit());
+   }
+
+   public void conDB() {
+      try {
+         Class.forName("com.mysql.cj.jdbc.Driver");
+         System.out.println("드라이버 로드 성공");
+      } catch (ClassNotFoundException e) {
+         e.printStackTrace();
+      }
+   }
+
+ 
+   private class ActionListenerInit implements ActionListener{
+	   public void actionPerformed(ActionEvent e) {
+		   int rowcount;
+		   txtResult.setText("");
+		   System.out.println("DB 초기화는 여기에");
+		   try {
+			   stmt=con.createStatement();
+			    
+			   String query="delete FROM orders";
+			   rowcount=stmt.executeUpdate(query);
+			   System.out.println("orders 테이블에서" + rowcount + "튜플 삭제");
+			   txtResult.append("**** orders 테이블에서 "+rowcount+"개의 튜플이 삭제되었습니다. ****\n\n");
+			   
+			   query="delete FROM book";
+			   rowcount=stmt.executeUpdate(query);
+			   System.out.println("book 테이블에서" + rowcount + "튜플 삭제");
+			   txtResult.append("**** book 테이블에서 "+rowcount+"개의 튜플이 삭제되었습니다. ****\n\n");
+			   
+			   query="delete FROM customer";
+			   rowcount=stmt.executeUpdate(query);
+			   System.out.println("customer 테이블에서" + rowcount + "튜플 삭제");
+			   txtResult.append("**** customer 테이블에서 "+rowcount+"개의 튜플이 삭제되었습니다. ****\n\n");
+			   
+			   //튜플 초기화 시키기
+//			 String query4 = sb.append("INSERT INTO Orders VALUES('"+Integer.parseInt(arr[0])+"','"+Integer.parseInt(arr[1])+"','"+Integer.parseInt(arr[2])+"','"+Integer.parseInt(arr[3])+"','"+arr[4]+"')")
+//		                .toString(); 
+			  String[] query_orders=new String[20];
+			  String[] query_book=new String[20];
+			  String[] query_customer=new String[10];
+			  
+			  query_book[0]="INSERT INTO Book VALUES('1','축구의 역사','굿스포츠','7000')";
+			  query_book[1]="INSERT INTO Book VALUES('2','축구아는 여자','나무수','13000')";
+			  query_book[2]="INSERT INTO Book VALUES('3','축구의 이해','대한미디어','22000')";
+			  query_book[3]="INSERT INTO Book VALUES('4','골프 바이플','대한미디어','35000')";
+			  query_book[4]="INSERT INTO Book VALUES('5','피겨 교본','굿스포츠','8000')";
+			  query_book[5]="INSERT INTO Book VALUES('6','역도 단계별기술','굿스포츠','6000')";
+			  query_book[6]="INSERT INTO Book VALUES('7','야구의 추억','이상미디어','20000')";
+			  query_book[7]="INSERT INTO Book VALUES('8','야구를 부탁해','이상미디어','13000')";
+			  query_book[8]="INSERT INTO Book VALUES('9','올림픽 이야기','삼성당','7500')";
+			  query_book[9]="INSERT INTO Book VALUES('10','Olympic Champions','Pearson','13000')";
+			  query_book[10]="INSERT INTO Book VALUES('11','공자의 논어','홍익출판사','11000')";
+			  query_book[11]="INSERT INTO Book VALUES('12','반지의 제왕','한빛미디어','10000')";
+			  query_book[12]="INSERT INTO Book VALUES('13','맹자','맹자출판사','9000')";
+			  query_book[13]="INSERT INTO Book VALUES('14','해리포터','롤링출판사','15000')";
+			  query_book[14]="INSERT INTO Book VALUES('15','이산수학','경문사','19000')";
+			  query_book[15]="INSERT INTO Book VALUES('16','글쓴기와 토론','세종대학교','8000')";
+			  query_book[16]="INSERT INTO Book VALUES('17','신호와 시스템','범한서적','21000')";
+			  query_book[17]="INSERT INTO Book VALUES('18','무선통신 시스템','21세기사','27000')";
+			  query_book[18]="INSERT INTO Book VALUES('19','알고리즘','교보문고','30000')";
+			  query_book[19]="INSERT INTO Book VALUES('20','컴퓨터 개론','한빛아카데미','23000')";
+			  
+			  query_customer[0]="INSERT INTO Customer VALUES('1','박지성','영국 맨체스타','000-5000-0001')";
+			  query_customer[1]="INSERT INTO Customer VALUES('2','김연아','대한민국 서울','000-6000-0001')";
+			  query_customer[2]="INSERT INTO Customer VALUES('3','장미란','대한민국 강원도','000-7000-0001')";
+			  query_customer[3]="INSERT INTO Customer VALUES('4','추신수','미국 클리블랜드','000-8000-0001')";
+			  query_customer[4]="INSERT INTO Customer VALUES('5','김병준','대한민국 서울','000-9000-0001')";
+			  query_customer[5]="INSERT INTO Customer VALUES('6','김경민','대한민국 인천','001-1000-0001')";
+			  query_customer[6]="INSERT INTO Customer VALUES('7','김민수','대한민국 전라도','001-2000-0001')";
+			  query_customer[7]="INSERT INTO Customer VALUES('8','정우진','대한민국 제주도','001-3000-0001')";
+			  query_customer[8]="INSERT INTO Customer VALUES('9','박민준','대한민국 부산','001-4000-0001')";
+			  query_customer[9]="INSERT INTO Customer VALUES('10','윤우성','대한민국 경상도','001-5000-0001')";			  			 
+			  
+			  query_orders[0]="INSERT INTO Orders VALUES('1','1','1','6000','2014-07-01')";
+			  query_orders[1]="INSERT INTO Orders VALUES('2','1','3','21000','2014-07-03')";
+			  query_orders[2]="INSERT INTO Orders VALUES('3','2','5','8000','2014-07-03')";
+			  query_orders[3]="INSERT INTO Orders VALUES('4','3','6','6000','2014-07-04')";
+			  query_orders[4]="INSERT INTO Orders VALUES('5','4','7','20000','2014-07-05')";
+			  query_orders[5]="INSERT INTO Orders VALUES('6','1','2','12000','2014-07-07')";
+			  query_orders[6]="INSERT INTO Orders VALUES('7','4','8','13000','2014-07-07')";
+			  query_orders[7]="INSERT INTO Orders VALUES('8','3','10','12000','2014-07-08')";
+			  query_orders[8]="INSERT INTO Orders VALUES('9','2','10','7000','2014-07-09')";
+			  query_orders[9]="INSERT INTO Orders VALUES('10','6','8','13000','2014-07-10')";
+			  query_orders[10]="INSERT INTO Orders VALUES('11','7','11','10000','2014-07-11')";
+			  query_orders[11]="INSERT INTO Orders VALUES('12','8','12','9000','2014-07-12')";
+			  query_orders[12]="INSERT INTO Orders VALUES('13','9','13','9000','2014-07-13')";
+			  query_orders[13]="INSERT INTO Orders VALUES('14','10','14','14000','2014-07-14')";
+			  query_orders[14]="INSERT INTO Orders VALUES('15','6','15','18000','2014-07-15')";
+			  query_orders[15]="INSERT INTO Orders VALUES('16','7','16','8000','2014-07-16')";
+			  query_orders[16]="INSERT INTO Orders VALUES('17','8','17','20000','2014-07-17')";
+			  query_orders[17]="INSERT INTO Orders VALUES('18','9','18','25000','2014-07-18')";
+			  query_orders[18]="INSERT INTO Orders VALUES('19','10','19','30000','2014-07-19')";
+			  query_orders[19]="INSERT INTO Orders VALUES('20','6','20','23000','2014-07-20')";
+			  
+			  
+			  
+			 for(int k=0;k<20;k++)
+				 stmt.executeUpdate(query_book[k]);
+			 for(int k=0;k<10;k++)
+				  stmt.executeUpdate(query_customer[k]);
+			 for(int k=0;k<20;k++)
+				  stmt.executeUpdate(query_orders[k]);
+			 
+			 
+			 
+			 
+		   }catch(Exception e5) {
+			   System.out.println("DB 초기화 실패"+e5);
+		   }
+	   }
+   }
+   @Override
+   public void actionPerformed(ActionEvent e) {
+      try { /* 데이터베이스를 연결하는 과정 */
+//         System.out.println("데이터베이스 연결 준비...");
+         con = DriverManager.getConnection(url, userid, pwd);
+//         System.out.println("데이터베이스 연결 성공");
+      } catch (SQLException e1) {
+         e1.printStackTrace();
+      }
+      try {
+         stmt = con.createStatement();
+         StringBuilder sb = new StringBuilder();
+         String query = "SELECT * FROM Book ";
+         String query2 = "SELECT * FROM Orders ";
+         String query3 = "SELECT * FROM Customer ";
+         if (e.getSource() == btnOk) {//book에 관한 것.
+        	 tf.setEditable(false);
+        	 txtResult.setText("");
+            txtResult.setText("BOOKNO           BOOK NAME       PUBLISHER      PRICE\n");
+            rs = stmt.executeQuery(query);
+            while (rs.next()) {
+               String str = rs.getInt(1) + "\t" + rs.getString(2) + "\t" + rs.getString(3) + "\t" + rs.getInt(4)
+                     + "\n";
+               txtResult.append(str);
+            }
+            
+         }
+         else if (e.getSource() == btnOk2) {//orders에 관한것
+        	 tf.setEditable(false);
+        	 txtResult.setText("");
+             txtResult.setText("ORDERID          CUSTID              BOOKID              SALEPRICE          ORDERDATE\n");
+             rs = stmt.executeQuery(query2);
+             while (rs.next()) {
+                String str2 = rs.getInt(1) + "\t" + rs.getInt(2) + "\t" + rs.getInt(3) + "\t" + rs.getInt(4) + "\t    " + rs.getString(5)
+                      + "\n";
+                txtResult.append(str2);
+             }
+             
+          }
+         else if (e.getSource() == btnOk3) {//customer에 관한것
+        	 tf.setEditable(false);
+        	 txtResult.setText("");
+             txtResult.setText("CUSTID              NAME                   ADDRESS              PHONE\n");
+             rs = stmt.executeQuery(query3);
+             while (rs.next()) {
+                String str3 = rs.getInt(1) + "\t" + rs.getString(2) + "\t" + rs.getString(3) + "\t    " + rs.getString(4)
+                      + "\n";
+                txtResult.append(str3);
+             }
+             
+          }
+         else if (e.getSource() == btnOk5) {//텍스트 필드 활성에 관한것
+        	 tf.setEditable(true);
+        	 txtResult.setText(" ****맨 하단 TextField창에 orderid(int), custid(int), bookid(int), saleprice(int),orderdate(char)를 순서대로 한줄에 입력해 주세요****\n\n**** 입력 예시 : 21 1 1 1 2020-07-07 (한줄 입력) ****\n\n**** 맨 하단Textfield창에 값 입력후 [Enter]를 치고 [입력1] 버튼을 눌러줍니다! ****\n\n**** 한번에 하나의 튜플만 INSERT가능합니다! ****\n\n");
+        	 tf.addActionListener(new ActionListener() {
+      			public void actionPerformed(ActionEvent k) {
+      				JTextField t = (JTextField)k.getSource();
+      				id =t.getText();
+      				txtResult.append(t.getText() + "\n");
+      				StringTokenizer st=new StringTokenizer(id," ");
+      				int i=0;
+      				while(st.hasMoreTokens()) {
+      					arr[i]=st.nextToken();
+      					i++;
+      				}
+ 				arr2[cnt]=Integer.parseInt(arr[0]);
+      			t.setText("");
+      			t.setEditable(false);
+      			}
+      		});
+          }
+         else if (e.getSource() == btnOk4) {//입력에 관한것
+        	 tf.setEditable(false);
+        	 try {
+            	 txtResult.setText("**** 쿼리 읽기 성공 ****\n\n****ORDERS 테이블에 orderid : "+arr[0]+", custid : "+arr[1]+", bookid : "+arr[2]+", saleprice : "+arr[3]+", orderdate : "+arr[4]+ " 가 INSERT되었습니다.****\n");
+           	 String query4 = sb.append("INSERT INTO Orders VALUES('"+Integer.parseInt(arr[0])+"','"+Integer.parseInt(arr[1])+"','"+Integer.parseInt(arr[2])+"','"+Integer.parseInt(arr[3])+"','"+arr[4]+"')")
+    		                .toString(); 
+    			stmt.executeUpdate(query4);
+    			cnt++;
+    			arr[0]=null;
+    			arr[1]=null;
+    			arr[2]=null;
+    			arr[3]=null;
+    			arr[4]=null;
+        	 }catch(Exception e3) {
+        		 txtResult.setText(" **** 쿼리 읽기 실패 : "+e3+" ****\n\n**** [TextField활성] 버튼을 눌러 TextField에 내용을 입력후 다시 [입력1]버튼을 눌러주세요 ****\n\n");
+        		 System.out.println("쿼리 읽기 실패 :" + e3);
+        	 }	
+          }
+         else if (e.getSource() == btnReset) {//초기화 관련된 것.
+        	 String query5;
+        	 tf.setEditable(false);
+        	 try {
+        		 sb.append("DELETE FROM Orders WHERE orderid in ( ");
+            	 for (int i = 0; i < cnt; i++) {
+            	 sb.append(arr2[i]);
+            	 if (i + 1 < cnt)
+            	 sb.append(", ");
+            	 }
+            	 query5 = sb.append(");").toString();
+            	 stmt.executeUpdate(query5);
+            	 txtResult.setText("**** 초기화 되었습니다. ****\n\n");
+            	 for(int i=0;i<cnt;i++) {
+            		 txtResult.append("**** custid :"+arr2[i]+"의 튜플이 삭제되었습니다. ****\n\n");
+            	 }
+            	 cnt = 0;
+        	 }catch(Exception e4){
+        		 txtResult.setText(" **** 쿼리 읽기 실패 : "+e4+" ****\n\n");
+        		 System.out.println("쿼리 읽기 실패 :" + e4);
+        	 }
+         }
+      } catch (Exception e2) {
+         System.out.println("쿼리 읽기 실패 :" + e2);
+      } 
+//      finally {
+//         try {
+//            if (rs != null)
+//               rs.close();
+//            if (stmt != null)
+//               stmt.close();
+//            if (con != null)
+//               con.close();
+//         } catch (Exception e3) {
+//            // TODO: handle exception
+//         }
+//      }
+   }
+
+   public static void main(String[] args) {
+      bookListSwing_15011752 BLS= new bookListSwing_15011752();
+      BLS.addWindowListener(new WindowAdapter() {
+    	  public void windowClosing(WindowEvent we) {
+    		try {
+    			con.close();
+    		} catch (Exception e4) { 	}
+    		System.out.println("프로그램 완전 종료!");    		
+    	    System.exit(0);
+    	  }
+    	});
+   }
+}
+
